@@ -1,7 +1,7 @@
 package br.com.io.booksstore.clients.services;
 
 import br.com.io.booksstore.clients.application.domain.Client;
-import br.com.io.booksstore.clients.infrastructure.ClientRepository;
+import br.com.io.booksstore.clients.infrastructure.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

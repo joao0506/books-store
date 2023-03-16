@@ -22,6 +22,7 @@ public class GatewayApplication {
 		return builder
 				.routes()
 				.route(r -> r.path("/clients/**").uri("lb://clients-microservice"))
+				.route(r -> r.path("/books/**").uri("lb://books-microservice"))
 				.build();
 	}
 
