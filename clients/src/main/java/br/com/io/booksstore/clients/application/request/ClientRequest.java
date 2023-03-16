@@ -3,8 +3,10 @@ package br.com.io.booksstore.clients.application.request;
 import br.com.io.booksstore.clients.application.domain.Client;
 import br.com.io.booksstore.clients.application.utils.GenerateUUID;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class ClientRequest {
 
     private String name;
