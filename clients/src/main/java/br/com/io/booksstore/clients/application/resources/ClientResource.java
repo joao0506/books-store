@@ -5,13 +5,11 @@ import br.com.io.booksstore.clients.application.request.ClientRequest;
 import br.com.io.booksstore.clients.services.ClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("clients")
@@ -28,6 +26,14 @@ public class ClientResource {
                 .path("/{id}")
                 .buildAndExpand(client.getId()).toUri();
         return ResponseEntity.created(location).build();
+    }
+    
+    @GetMapping(params = "id")
+    public ResponseEntity findClientById(@RequestParam("id") String id){
+        Optional<Client> client = service.findClientById(id);
+        if (client.isPresent())
+            return ResponseEntity.ok(client);
+        return ResponseEntity.notFound().build();
     }
 
 
