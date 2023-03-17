@@ -15,10 +15,11 @@ public class BookRequest {
     private String author;
     private BigDecimal price;
     private Integer pages;
+    private Integer stock;
 
     public Book toDomain(){
         String id = GenerateUUID.getUUID();
-        return new Book(id, name, author, price, pages);
+        return new Book(id, name, author, price, pages, stock);
     }
 
 }

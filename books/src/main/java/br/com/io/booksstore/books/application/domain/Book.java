@@ -21,5 +21,7 @@ public class Book {
     private BigDecimal price;
     private Integer pages;
 
+    private Integer stock;
+
 }
 
