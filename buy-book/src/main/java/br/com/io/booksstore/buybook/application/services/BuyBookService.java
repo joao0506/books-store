@@ -1,5 +1,6 @@
 package br.com.io.booksstore.buybook.application.services;
 
+import br.com.io.booksstore.buybook.application.domain.OrderBook;
 import br.com.io.booksstore.buybook.application.exceptions.GenericException;
 import br.com.io.booksstore.buybook.application.exceptions.NotFoundException;
 import br.com.io.booksstore.buybook.application.request.BuyBookRequest;
@@ -7,6 +8,7 @@ import br.com.io.booksstore.buybook.application.response.BookResponse;
 import br.com.io.booksstore.buybook.application.response.ClientResponse;
 import br.com.io.booksstore.buybook.infrastructure.BooksResource;
 import br.com.io.booksstore.buybook.infrastructure.ClientsResource;
+import br.com.io.booksstore.buybook.infrastructure.repository.OrderRepository;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +16,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.net.ConnectException;
+import javax.transaction.Transactional;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,13 +31,37 @@ public class BuyBookService {
 
     private final BooksResource booksResource;
 
-    public void buyBook(BuyBookRequest request) throws NotFoundException, GenericException {
+    private final OrderRepository orderRepository;
+
+    public String buyBook(BuyBookRequest request) throws NotFoundException, GenericException {
         Optional<ClientResponse> client = getClientFromClientsMicroservice(request.getClientId());
         Optional<BookResponse> book = getBookFromBooksMicroservice(request.getBookId());
 
-        if (!client.isPresent() || !book.isPresent()) throw new GenericException();
+        if (!client.isPresent() || !book.isPresent())
+            throw new GenericException("");
+        if (request.getQuantity() > book.get().getStock())
+            throw new GenericException("Quantity on this buy is bigger than stock!");
 
+        BigDecimal buyValue = calculateBuyValue(BigDecimal.valueOf(request.getQuantity()), book.get().getPrice());
 
+        OrderBook order = OrderBook.builder()
+                .orderBookId(UUID.randomUUID().toString())
+                .orderBookDateTime(LocalDateTime.now())
+                .quantity(request.getQuantity())
+                .orderBookTotal(buyValue)
+                .bookId(book.get().getId())
+                .unitBookPrice(book.get().getPrice())
+                .clientId(client.get().getId())
+                .build();
+
+        log.info("Saving the order: {}", order.toString());
+        saveOrder(order);
+        return order.getOrderBookId();
+    }
+
+    @Transactional
+    private void saveOrder(OrderBook order) {
+        orderRepository.save(order);
     }
 
     private Optional<ClientResponse> getClientFromClientsMicroservice(String clientId) throws NotFoundException {
@@ -61,6 +90,10 @@ public class BuyBookService {
             log.error("Error getting object from books-microservice: {}", e.getMessage());
             return book;
         }
+    }
+
+    private BigDecimal calculateBuyValue(BigDecimal quantity, BigDecimal price) {
+        return price.multiply(quantity);
     }
 
 }

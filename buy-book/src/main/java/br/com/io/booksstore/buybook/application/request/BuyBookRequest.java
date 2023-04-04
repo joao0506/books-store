@@ -11,6 +11,6 @@ public class BuyBookRequest {
 
     private String clientId;
     private String bookId;
-    private String quantity;
+    private Integer quantity;
 
 }
