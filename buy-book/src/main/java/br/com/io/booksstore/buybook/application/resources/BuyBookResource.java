@@ -9,6 +9,7 @@ import br.com.io.booksstore.buybook.infrastructure.ClientsResource;
 import ch.qos.logback.core.net.server.Client;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +30,7 @@ public class BuyBookResource {
             service.buyBook(request);
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (GenericException e){
             return ResponseEntity.internalServerError().build();
         }
