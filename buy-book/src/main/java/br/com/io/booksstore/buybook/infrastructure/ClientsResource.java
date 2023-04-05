@@ -1,6 +1,6 @@
 package br.com.io.booksstore.buybook.infrastructure;
 
-import br.com.io.booksstore.buybook.application.response.ClientResponse;
+import br.com.io.booksstore.buybook.application.response.Client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,5 +10,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface ClientsResource {
 
     @GetMapping(params = "id")
-    ResponseEntity<ClientResponse> findClientById(@RequestParam("id") String id);
+    ResponseEntity<Client> findClientById(@RequestParam("id") String id);
 }

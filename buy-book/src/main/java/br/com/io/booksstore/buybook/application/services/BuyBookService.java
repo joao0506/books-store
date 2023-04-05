@@ -4,8 +4,8 @@ import br.com.io.booksstore.buybook.application.domain.OrderBook;
 import br.com.io.booksstore.buybook.application.exceptions.GenericException;
 import br.com.io.booksstore.buybook.application.exceptions.NotFoundException;
 import br.com.io.booksstore.buybook.application.request.BuyBookRequest;
-import br.com.io.booksstore.buybook.application.response.BookResponse;
-import br.com.io.booksstore.buybook.application.response.ClientResponse;
+import br.com.io.booksstore.buybook.application.response.Book;
+import br.com.io.booksstore.buybook.application.response.Client;
 import br.com.io.booksstore.buybook.infrastructure.BooksResource;
 import br.com.io.booksstore.buybook.infrastructure.ClientsResource;
 import br.com.io.booksstore.buybook.infrastructure.repository.OrderRepository;
@@ -34,8 +34,8 @@ public class BuyBookService {
     private final OrderRepository orderRepository;
 
     public String buyBook(BuyBookRequest request) throws NotFoundException, GenericException {
-        Optional<ClientResponse> client = getClientFromClientsMicroservice(request.getClientId());
-        Optional<BookResponse> book = getBookFromBooksMicroservice(request.getBookId());
+        Optional<Client> client = getClientFromClientsMicroservice(request.getClientId());
+        Optional<Book> book = getBookFromBooksMicroservice(request.getBookId());
 
         if (!client.isPresent() || !book.isPresent())
             throw new GenericException("");
@@ -64,11 +64,11 @@ public class BuyBookService {
         orderRepository.save(order);
     }
 
-    private Optional<ClientResponse> getClientFromClientsMicroservice(String clientId) throws NotFoundException {
-        Optional<ClientResponse> client = Optional.empty();
+    private Optional<Client> getClientFromClientsMicroservice(String clientId) throws NotFoundException {
+        Optional<Client> client = Optional.empty();
         try{
             log.info("Getting client information from clients-microservice with client id: {}", clientId);
-            ResponseEntity<ClientResponse> response = clientsResource.findClientById(clientId);
+            ResponseEntity<Client> response = clientsResource.findClientById(clientId);
 
             return Optional.of(response.getBody());
         } catch (FeignException e){
@@ -78,11 +78,11 @@ public class BuyBookService {
         }
     }
 
-    private Optional<BookResponse> getBookFromBooksMicroservice(String bookId) throws NotFoundException {
-        Optional<BookResponse> book = Optional.empty();
+    private Optional<Book> getBookFromBooksMicroservice(String bookId) throws NotFoundException {
+        Optional<Book> book = Optional.empty();
         try{
             log.info("Getting book information from books-microservice with book id: {}", bookId);
-            ResponseEntity<BookResponse> response = booksResource.findBookById(bookId);
+            ResponseEntity<Book> response = booksResource.findBookById(bookId);
 
             return Optional.of(response.getBody());
         } catch (FeignException e){

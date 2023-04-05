@@ -1,9 +1,13 @@
 package br.com.io.booksstore.books.application.resource;
 
 import br.com.io.booksstore.books.application.domain.Book;
+import br.com.io.booksstore.books.application.domain.BuyBookMessageObject;
 import br.com.io.booksstore.books.application.request.BookRequest;
+import br.com.io.booksstore.books.application.request.BuyBookRequest;
 import br.com.io.booksstore.books.application.services.BookService;
+import br.com.io.booksstore.books.infrastructure.repository.mqueue.BuyBookPublisher;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -17,6 +21,7 @@ import java.util.Optional;
 public class BookResource {
 
     private final BookService service;
+
 
     @PostMapping
     public ResponseEntity saveBook(@RequestBody BookRequest request){
@@ -34,6 +39,16 @@ public class BookResource {
         if (book.isPresent())
             return ResponseEntity.ok(book);
         return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/buy-book")
+    public ResponseEntity buyBook(@RequestBody BuyBookRequest request) {
+        try{
+            service.buyBook(request);
+            return ResponseEntity.ok().build();
+        } catch (Exception e){
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
 }

@@ -1,6 +1,5 @@
 package br.com.io.booksstore.buybook.application.domain;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
