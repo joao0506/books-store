@@ -34,7 +34,7 @@ public class BookService {
         Book book = this.findBookById(request.getBookId()).get();
 
         if (validateBookStock(book.getStock(), request.getQuantity())){
-            BuyBookMessageObject objectMessageRequest = new BuyBookMessageObject(book.getId(), book.getPrice(), request.getClientId());
+            BuyBookMessageObject objectMessageRequest = new BuyBookMessageObject(book.getId(), book.getPrice(), request.getQuantity(), request.getClientId());
             publisher.publishBuyBook(objectMessageRequest);
 
             Integer stockRemaining = book.getStock() - request.getQuantity();

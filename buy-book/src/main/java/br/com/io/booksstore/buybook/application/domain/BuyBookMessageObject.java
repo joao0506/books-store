@@ -1,4 +1,4 @@
-package br.com.io.booksstore.books.application.domain;
+package br.com.io.booksstore.buybook.application.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

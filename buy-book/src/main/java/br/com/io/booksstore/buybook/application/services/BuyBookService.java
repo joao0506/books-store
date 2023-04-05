@@ -1,10 +1,9 @@
 package br.com.io.booksstore.buybook.application.services;
 
+import br.com.io.booksstore.buybook.application.domain.BuyBookMessageObject;
 import br.com.io.booksstore.buybook.application.domain.OrderBook;
 import br.com.io.booksstore.buybook.application.exceptions.GenericException;
 import br.com.io.booksstore.buybook.application.exceptions.NotFoundException;
-import br.com.io.booksstore.buybook.application.request.BuyBookRequest;
-import br.com.io.booksstore.buybook.application.response.Book;
 import br.com.io.booksstore.buybook.application.response.Client;
 import br.com.io.booksstore.buybook.infrastructure.BooksResource;
 import br.com.io.booksstore.buybook.infrastructure.ClientsResource;
@@ -29,34 +28,28 @@ public class BuyBookService {
 
     private final ClientsResource clientsResource;
 
-    private final BooksResource booksResource;
-
     private final OrderRepository orderRepository;
 
-    public String buyBook(BuyBookRequest request) throws NotFoundException, GenericException {
-        Optional<Client> client = getClientFromClientsMicroservice(request.getClientId());
-        Optional<Book> book = getBookFromBooksMicroservice(request.getBookId());
+    public void buyBook(BuyBookMessageObject object) throws NotFoundException, GenericException {
+        Optional<Client> client = getClientFromClientsMicroservice(object.getClienteId());
 
-        if (!client.isPresent() || !book.isPresent())
+        if (!client.isPresent())
             throw new GenericException("");
-        if (request.getQuantity() > book.get().getStock())
-            throw new GenericException("Quantity on this buy is bigger than stock!");
 
-        BigDecimal buyValue = calculateBuyValue(BigDecimal.valueOf(request.getQuantity()), book.get().getPrice());
+        BigDecimal buyValue = calculateBuyValue(BigDecimal.valueOf(object.getQuantity()), object.getPrice());
 
         OrderBook order = OrderBook.builder()
                 .orderBookId(UUID.randomUUID().toString())
                 .orderBookDateTime(LocalDateTime.now())
-                .quantity(request.getQuantity())
+                .quantity(object.getQuantity())
                 .orderBookTotal(buyValue)
-                .bookId(book.get().getId())
-                .unitBookPrice(book.get().getPrice())
+                .bookId(object.getBookId())
+                .unitBookPrice(object.getPrice())
                 .clientId(client.get().getId())
                 .build();
 
         log.info("Saving the order: {}", order.toString());
         saveOrder(order);
-        return order.getOrderBookId();
     }
 
     @Transactional
@@ -75,20 +68,6 @@ public class BuyBookService {
             if (e.status() == HttpStatus.NOT_FOUND.value()) throw new NotFoundException("Client not found!");
             log.error("Error getting object from clients-microservice: {}", e.getMessage());
             return client;
-        }
-    }
-
-    private Optional<Book> getBookFromBooksMicroservice(String bookId) throws NotFoundException {
-        Optional<Book> book = Optional.empty();
-        try{
-            log.info("Getting book information from books-microservice with book id: {}", bookId);
-            ResponseEntity<Book> response = booksResource.findBookById(bookId);
-
-            return Optional.of(response.getBody());
-        } catch (FeignException e){
-            if (e.status() == HttpStatus.NOT_FOUND.value()) throw new NotFoundException("Book not found!");
-            log.error("Error getting object from books-microservice: {}", e.getMessage());
-            return book;
         }
     }
 
