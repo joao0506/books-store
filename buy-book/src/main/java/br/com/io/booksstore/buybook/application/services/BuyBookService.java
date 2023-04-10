@@ -5,7 +5,6 @@ import br.com.io.booksstore.buybook.application.domain.OrderBook;
 import br.com.io.booksstore.buybook.application.exceptions.GenericException;
 import br.com.io.booksstore.buybook.application.exceptions.NotFoundException;
 import br.com.io.booksstore.buybook.application.response.Client;
-import br.com.io.booksstore.buybook.infrastructure.BooksResource;
 import br.com.io.booksstore.buybook.infrastructure.ClientsResource;
 import br.com.io.booksstore.buybook.infrastructure.repository.OrderRepository;
 import feign.FeignException;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -75,4 +75,7 @@ public class BuyBookService {
         return price.multiply(quantity);
     }
 
+    public List<OrderBook> findOrderBooksById(String clientId) {
+        return orderRepository.findAllByClientId(clientId);
+    }
 }

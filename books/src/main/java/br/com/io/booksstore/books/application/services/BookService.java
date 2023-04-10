@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,6 +29,10 @@ public class BookService {
 
     public Optional<Book> findBookById(String id) {
         return repository.findById(id);
+    }
+
+    public List<Book> findAllBooks() {
+        return repository.findAll();
     }
 
     public void buyBook(BuyBookRequest request) throws JsonProcessingException, GenericException {

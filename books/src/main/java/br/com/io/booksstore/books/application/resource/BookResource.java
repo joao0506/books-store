@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("books")
 @RequiredArgsConstructor
+@CrossOrigin
 public class BookResource {
 
     private final BookService service;
@@ -31,6 +33,12 @@ public class BookResource {
                 .path("/{id}")
                 .buildAndExpand(book.getId()).toUri();
         return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping
+    public ResponseEntity findAllBooks(){
+        List<Book> books = service.findAllBooks();
+        return ResponseEntity.ok(books);
     }
 
     @GetMapping(params = "id")
